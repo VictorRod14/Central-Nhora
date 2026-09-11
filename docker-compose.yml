@@ -1,0 +1,41 @@
+services:
+  backend:
+    build: ./backend
+    container_name: central_nhora_backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    expose:
+      - "8300"
+    networks:
+      atendimento_internal:
+      nohra_network:
+        aliases:
+          - atendimento_backend
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    container_name: central_nhora_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    expose:
+      - "3300"
+    networks:
+      atendimento_internal:
+      nohra_network:
+        aliases:
+          - atendimento_frontend
+
+networks:
+  atendimento_internal:
+    driver: bridge
+
+  nohra_network:
+    external: true
+    name: nohra_default
